@@ -10,8 +10,8 @@ export default class ListMain extends Component {
 
         this.state = {
             page: 1,
-            cont: [ ],
-            pageBol: false
+            cont: [],
+            pageBol: true
         }
     }
 
@@ -27,15 +27,15 @@ export default class ListMain extends Component {
                 cont: [],
                 page: 1
             })
+            this.fetchData(nextProps.location);
         }
-        this.fetchData(nextProps.location);
     }
 
     fetchData(location) {
         let state = location.state
         let url = state == undefined ? api.homeNewInfo : api.classInfo + '/' + state.classid;
 
-        url += '?page='+ this.page +'&page_size=15';
+        url += '?page='+ this.state.page +'&page_size=15';
 
         fetch(url ,{
             method: 'GET',
@@ -52,18 +52,14 @@ export default class ListMain extends Component {
     }
 
     _onscroll() {
-        console.log(this.state.pageBol)
         let scrollTop =  document.documentElement.scrollTop || document.body.scrollTop;
         let winHeight =  document.body.offsetHeight;
         let innerHeight = window.innerHeight;
-        if(parseInt(winHeight - scrollTop - innerHeight) < 350) {
-
-            !this.state.pageBol && this.setState({page: ++this.state.page, pageBol: true})
-
-            console.log(this.state.page)
-
+        if(this.state.pageBol && parseInt(winHeight - scrollTop - innerHeight) < 350) {
+            this.setState({page: ++this.state.page,pageBol: false})
+            this.fetchData(this.props.location)
         }else{
-            this.setState({pageBol: false})
+            this.setState({pageBol: true})
         }
     }
 
